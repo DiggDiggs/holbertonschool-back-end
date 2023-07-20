@@ -28,8 +28,10 @@ if __name__ == "__main__":
     total_tasks = len(todo_data)
 
     # Print employee progress
+    emp_name = employee_data['name']
+    emp_done = len(completed_tasks)
     employee_progress = "Employee {} is done with tasks({}/{}):".format(
-        employee_data['name'], len(completed_tasks), total_tasks
+        emp_name, emp_done, total_tasks
     )
     print(employee_progress)
 
