@@ -1,38 +1,38 @@
 #!/usr/bin/python3
 """
-Script that starts a Flask web app
+Script that retrieves TODO list given employee ID from a REST API.
 """
 
-from flask import Flask, render_template
-from models.storage import storage
-from models.state import State
+import requests
+from sys import argv
 
-app = Flask(__name__)
+if __name__ == "__main__":
+    if len(argv) != 2 or not argv[1].isdigit():
+        print("Usage: {} <employee_id>".format(argv[0]))
+        exit(1)
 
+    employee_id = int(argv[1])
 
-@app.teardown_appcontext
-def teardown_appcontext(exception):
-    """Tear down session"""
-    storage.close()
+    # Fetch employee data
+    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
+    user_response = requests.get(user_url)
+    employee_data = user_response.json()
 
+    # Fetch TODO list data
+    todo_url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(employee_id)
+    todo_response = requests.get(todo_url)
+    todo_data = todo_response.json()
 
-@app.route('/states_list', strict_slashes=False)
-def states_list():
-    """Display a list of states"""
-    states = storage.all(State)
-    return render_template('7-states_list.html', states=states.values())
+    # Get completed tasks and total tasks count
+    completed_tasks = [task for task in todo_data if task['completed']]
+    total_tasks = len(todo_data)
 
+    # Print employee progress
+    employee_progress = "Employee {} is done with tasks({}/{}):".format(
+        employee_data['name'], len(completed_tasks), total_tasks
+    )
+    print(employee_progress)
 
-@app.route('/states/<id>', strict_slashes=False)
-def states_id(id):
-    """Display state with given id and its cities"""
-    state = storage.get(State, id)
-    if state:
-        cities = sorted(state.cities, key=lambda city: city.name)
-        return render_template('9-states.html', state=state, cities=cities)
-    else:
-        return render_template('9-states.html', not_found=True)
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    # Print completed task titles
+    for task in completed_tasks:
+        print("\t{}".format(task['title']))
