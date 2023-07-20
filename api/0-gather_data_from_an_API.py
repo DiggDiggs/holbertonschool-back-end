@@ -14,14 +14,14 @@ if __name__ == "__main__":
     employee_id = int(argv[1])
 
     # Fetch employee data
-    url_user = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
-    response_user = requests.get(url_user)
-    employee_data = response_user.json()
+    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
+    user_response = requests.get(user_url)
+    employee_data = user_response.json()
 
     # Fetch TODO list data
-    url_todo = "https://jsonplaceholder.typicode.com/todos?userId={}".format(employee_id)
-    response_todo = requests.get(url_todo)
-    todo_data = response_todo.json()
+    todo_url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(employee_id)
+    todo_response = requests.get(todo_url)
+    todo_data = todo_response.json()
 
     # Get completed tasks and total tasks count
     completed_tasks = [task for task in todo_data if task['completed']]
