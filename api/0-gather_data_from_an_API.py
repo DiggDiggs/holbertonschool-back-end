@@ -1,37 +1,38 @@
 #!/usr/bin/python3
 """
-Script that retrieves TODO list given employee ID from a REST API.
+Write a script that starts a Flask web app
 """
 
-import requests
-from sys import argv
+from flask import Flask, render_template
+from models.storage import storage
+from models.state import State
 
-if __name__ == "__main__":
-    if len(argv) != 2 or not argv[1].isdigit():
-        print("Usage: {} <employee_id>".format(argv[0]))
-        exit(1)
+app = Flask(__name__)
 
-    employee_id = int(argv[1])
 
-    # Fetch employee data
-    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
-    user_response = requests.get(user_url)
-    employee_data = user_response.json()
+@app.teardown_appcontext
+def teardown_appcontext(exception):
+    """Tear down session"""
+    storage.close()
 
-    # Fetch TODO list data
-    todo_url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(employee_id)
-    todo_response = requests.get(todo_url)
-    todo_data = todo_response.json()
 
-    # Get completed tasks and total tasks count
-    completed_tasks = [task for task in todo_data if task['completed']]
-    total_tasks = len(todo_data)
+@app.route('/states_list', strict_slashes=False)
+def states_list():
+    """List states"""
+    states = storage.all(State)
+    return render_template('7-states_list.html', states=states.values())
 
-    # Print employee progress
-    print("Employee {} is done with tasks({}/{}):".format(
-        employee_data['name'], len(completed_tasks), total_tasks
-    ))
 
-    # Print completed task titles
-    for task in completed_tasks:
-        print("\t{}".format(task['title']))
+@app.route('/states/<id>', strict_slashes=False)
+def states_id(id):
+    """Displays state with id"""
+    state = storage.get(State, id)
+    if state:
+        cities = sorted(state.cities, key=lambda city: city.name)
+        return render_template('9-states.html', state=state, cities=cities)
+    else:
+        return render_template('9-states.html', not_found=True)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
