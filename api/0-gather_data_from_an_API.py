@@ -29,8 +29,8 @@ if __name__ == "__main__":
 
     # Print employee progress
     print("Employee {} is done with tasks({}/{}):".format(
-        employee_data['name'], len(completed_tasks), total_tasks)
-    )
+        employee_data['name'], len(completed_tasks), total_tasks
+    ))
 
     # Print completed task titles
     for task in completed_tasks:
