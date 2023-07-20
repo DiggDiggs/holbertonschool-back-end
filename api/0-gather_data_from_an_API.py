@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Write a script that starts a Flask web app
+Script that starts a Flask web app
 """
 
 from flask import Flask, render_template
@@ -18,14 +18,14 @@ def teardown_appcontext(exception):
 
 @app.route('/states_list', strict_slashes=False)
 def states_list():
-    """List states"""
+    """Display a list of states"""
     states = storage.all(State)
     return render_template('7-states_list.html', states=states.values())
 
 
 @app.route('/states/<id>', strict_slashes=False)
 def states_id(id):
-    """Displays state with id"""
+    """Display state with given id and its cities"""
     state = storage.get(State, id)
     if state:
         cities = sorted(state.cities, key=lambda city: city.name)
